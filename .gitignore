@@ -1,0 +1,14 @@
+*.vsconfig
+*.sln
+*.csproj
+/2D_Defense/*.csproj
+/2D_Defense/*.vsconfig
+/2D_Defense/*.sln
+/2D_Defense/2D_Defense.sln
+/2D_Defense/Assembly-CSharp.csproj
+/2D_Defense/.vs
+/2D_Defense/Library
+/2D_Defense/Logs
+/2D_Defense/obj
+/2D_Defense/UserSettings
+/2D_Defense/.vsconfig
