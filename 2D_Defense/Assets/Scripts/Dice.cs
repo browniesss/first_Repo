@@ -14,15 +14,32 @@ public class Dice : MonoBehaviour
 
     public Slot parent_Slot;
 
+    LineRenderer lr;
+
     private void Start()
     {
         StartCoroutine(attack_Coroutine());
 
         parent_Slot = transform.parent.GetComponent<Slot>();
+
+        if (GetComponent<LineRenderer>() != null)
+        {
+            lr = GetComponent<LineRenderer>();
+            lr.startColor = new Color(255, 255, 0);
+            lr.endColor = new Color(255, 255, 0);
+            lr.startWidth = 0.05f;
+            lr.endWidth = 0.05f;
+        }
     }
 
     void Set_Target()
     {
+        if (!GameManager.Instance.isStage_Play)
+        {
+            target = null;
+            return;
+        }
+
         if (GameManager.Instance.enemy_List.Count > 0) // 적이 1마리 이상일때
         {
             GameObject[] enemy_Arr = GameManager.Instance.enemy_List.ToArray();
@@ -41,7 +58,7 @@ public class Dice : MonoBehaviour
             {
                 for (int i = 0; i < parent_Slot.Cur_Dice.level; i++)
                 {
-                    Attack();
+                    Attack_Type(dice_Name);
 
                     yield return new WaitForSeconds(0.1f);
                 }
@@ -63,16 +80,89 @@ public class Dice : MonoBehaviour
 
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
 
-        bullet.transform.DOMove(target.transform.position, 0.05f).SetEase(Ease.Linear);
-
-        bullet_Destroy_Coroutine(bullet);
+        if (target != null)
+            bullet.transform.DOMove(target.transform.position, 0.05f).SetEase(Ease.Linear);
     }
 
-    IEnumerator bullet_Destroy_Coroutine(GameObject bullet)
+    void Attack_Type(string name)
     {
-        yield return new WaitForSeconds(1f);
+        switch (name)
+        {
+            case "Fire":
+                {
+                    Attack();
+                    GameObject[] enemy_Arr = GameManager.Instance.enemy_List.ToArray();
+                    int index = 0;
 
-        GameManager.Resource.Destroy(bullet);
+                    for (int i = 0; i < enemy_Arr.Length; i++)
+                    {
+                        if (enemy_Arr[i] == target)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (enemy_Arr.Length >= 2 && enemy_Arr[index + 1] != null)
+                        enemy_Arr[index + 1].GetComponent<Enemy>().isDamaged(parent_Slot.Cur_Dice.damage);
+
+                    GameObject eff_Obj = GameManager.Resource.Instantiate("Fire_Effect");
+                    eff_Obj.transform.position = target.transform.position;
+                    eff_Obj.GetComponent<Animation>().Play();
+                }
+                break;
+            case "Wind":
+                {
+                    Attack();
+                }
+                break;
+            case "Thunder":
+                {
+                    Attack();
+
+                    GameObject[] enemy_Arr = GameManager.Instance.enemy_List.ToArray();
+                    int index = 0;
+
+                    for (int i = 0; i < enemy_Arr.Length; i++)
+                    {
+                        if (enemy_Arr[i] == target)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (enemy_Arr.Length >= 2 && enemy_Arr[index + 1] != null)
+                        enemy_Arr[index + 1].GetComponent<Enemy>().isDamaged(parent_Slot.Cur_Dice.damage);
+                    if (enemy_Arr.Length >= 3 && enemy_Arr[index + 2] != null)
+                        enemy_Arr[index + 2].GetComponent<Enemy>().isDamaged(parent_Slot.Cur_Dice.damage);
+
+
+                    lr.enabled = true;
+                    if (enemy_Arr.Length >= 2 && enemy_Arr[index + 1] != null && target != null)
+                    {
+                        lr.SetPosition(0, target.transform.position);
+                        lr.SetPosition(1, enemy_Arr[index + 1].transform.position);
+                    }
+                    if (enemy_Arr.Length >= 3 && enemy_Arr[index + 2] != null && target != null)
+                    {
+                        if (lr.positionCount == 2)
+                            lr.positionCount += 1;
+
+                        lr.SetPosition(2, enemy_Arr[index + 2].transform.position);
+                    }
+
+                    StartCoroutine(thunder_Dice_Coroutine());
+                }
+                break;
+        }
+    }
+
+    IEnumerator thunder_Dice_Coroutine()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        lr.enabled = false;
     }
 
     private void Update()

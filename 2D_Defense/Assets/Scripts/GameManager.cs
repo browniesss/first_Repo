@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Text stage_Text;
 
-    private bool isStage_Play = false; // 현재 스테이지 진행중인지. 
+    public bool isStage_Play = false; // 현재 스테이지 진행중인지. 
 
     static void Init()
     {
@@ -95,7 +95,11 @@ public class GameManager : MonoBehaviour
             enemy_List.Enqueue(obj);
 
             obj.transform.position = Destination[0].position;
-            obj.GetComponent<Enemy>().Enemy_Move();
+
+            Enemy enemy = obj.GetComponent<Enemy>();
+
+            enemy.Enemy_Move();
+            enemy.HP = stageInfo[level].enemyHP;
 
             yield return new WaitForSeconds(0.5f);
         }
@@ -122,7 +126,7 @@ public class GameManager : MonoBehaviour
             return;
 
         int randSlot = Random.Range(0, temp_List.Count);
-        int randDice = Random.Range(0, 2);
+        int randDice = Random.Range(0, 3);
 
         Slot[] temp_Array = temp_List.ToArray();
 
@@ -177,11 +181,11 @@ public class GameManager : MonoBehaviour
 
             Debug.Log("스테이지 레벨 업");
 
-            foreach (Slot slot in slots)
-            {
-                if (slot.dice != null)
-                    slot.dice.GetComponent<Dice>().target = null;
-            }
+            //foreach (Slot slot in slots)
+            //{
+            //    if (slot.dice != null)
+            //        slot.dice.GetComponent<Dice>().target = null;
+            //}
 
         }
         else

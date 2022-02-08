@@ -15,4 +15,16 @@ public class Bullet : MonoBehaviour
     {
         
     }
+
+    private void OnEnable()
+    {
+        StartCoroutine(bullet_Destroy_Coroutine());
+    }
+
+    public IEnumerator bullet_Destroy_Coroutine()
+    {
+        yield return new WaitForSeconds(1f);
+
+        GameManager.Resource.Destroy(this.gameObject);
+    }
 }

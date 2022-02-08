@@ -6,7 +6,7 @@ public class ResourceManager : MonoBehaviour
 {
     public T Load<T>(string path) where T : Object
     {
-        if(typeof(T) == typeof(GameObject))
+        if (typeof(T) == typeof(GameObject))
         {
             string name = path;
             int index = name.LastIndexOf('/');
@@ -20,11 +20,11 @@ public class ResourceManager : MonoBehaviour
         return Resources.Load<T>(path);
     }
 
-    public GameObject Instantiate(string path,Transform parent = null)
+    public GameObject Instantiate(string path, Transform parent = null)
     {
         GameObject original = Load<GameObject>($"Prefabs/{path}");
 
-        if(original == null)
+        if (original == null)
         {
             Debug.Log($"Failed to load prefab : {path}");
             return null;
@@ -46,12 +46,27 @@ public class ResourceManager : MonoBehaviour
             return;
 
         Poolable poolable = go.GetComponent<Poolable>();
-        if(poolable != null)
+        if (poolable != null)
         {
             GameManager.ObjManager.Push(poolable);
             return;
         }
 
         Object.Destroy(go);
+    }
+
+    public void Self_Destroy()
+    {
+        if (this.gameObject == null)
+            return;
+
+        Poolable poolable = this.gameObject.GetComponent<Poolable>();
+        if (poolable != null)
+        {
+            GameManager.ObjManager.Push(poolable);
+            return;
+        }
+
+        Object.Destroy(this.gameObject);
     }
 }

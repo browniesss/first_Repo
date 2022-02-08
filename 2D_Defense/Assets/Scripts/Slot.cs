@@ -41,7 +41,13 @@ public class Slot : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public void OnDrag(PointerEventData eventData)
     {
         if (cur_dice != null)
+        {
+            Canvas canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
             DragSlot.instance.transform.position = eventData.position;
+        }
     }
    
     

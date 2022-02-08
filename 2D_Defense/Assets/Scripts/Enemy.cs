@@ -6,8 +6,9 @@ using DG.Tweening;
 public class Enemy : MonoBehaviour
 {
     [SerializeField]
-    private float HP;
+    private float hp;
 
+    public float HP { get => hp; set => hp = value; }
 
     void Start()
     {
@@ -36,14 +37,17 @@ public class Enemy : MonoBehaviour
     {
         if (collision.tag == "Bullet")
         {
-            Debug.Log("Ãæµ¹");
-            isDamaged(collision.GetComponent<Bullet>().parent_Dice.parent_Slot.Cur_Dice.damage);
+            Bullet bullet = collision.GetComponent<Bullet>();
+
+            if (bullet.parent_Dice.parent_Slot.Cur_Dice != null)
+                isDamaged(bullet.parent_Dice.parent_Slot.Cur_Dice.damage);
+
             GameManager.Resource.Destroy(collision.gameObject);
 
         }
     }
 
-    void isDamaged(float damage)
+    public void isDamaged(float damage)
     {
         HP -= damage;
 
@@ -61,7 +65,7 @@ public class Enemy : MonoBehaviour
 
             GameManager.Instance.Cur_Player.have_Money += 20;
 
-            GameManager.Instance.Cur_Player.cur_KillCount++;
+            GameManager.Instance.Cur_Player.cur_KillCount += 1;
 
             GameManager.Instance.Stage_Clear_Check();
         }
